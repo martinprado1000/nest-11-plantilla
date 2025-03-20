@@ -1,14 +1,14 @@
 version: '3'
 
 services:
-  nest-12-plantilla:
+  nest-11-plantilla:
     depends_on:
       - db
     build: 
       context: .
       dockerfile: Dockerfile
-    image: nest-12-plantilla-docker
-    container_name: nest-12-plantilla
+    image: nest-11-plantilla-docker
+    container_name: nest-11-plantilla
     restart: always # reiniciar el contenedor si se detiene
     ports:
       - "${PORT}:${PORT}"

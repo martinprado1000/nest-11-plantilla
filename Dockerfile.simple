@@ -1,12 +1,12 @@
 FROM node:18-alpine3.15
 
 # Set working directory
-RUN mkdir -p /var/www/nest-12-plantilla     # Creamos el directorio donde va a crear nuestra aplicacion dentro del linux
-WORKDIR /var/www/nest-12-plantilla
+RUN mkdir -p /var/www/nest-11-plantilla_produccion     # Creamos el directorio donde va a crear nuestra aplicacion dentro del linux
+WORKDIR /var/www/nest-11-plantilla_produccion
 
 # Copiar el directorio y su contenido
-COPY . ./var/www/nest-12-plantilla
-COPY package.json tsconfig.json tsconfig.build.json /var/www/nest-12-plantilla/
+COPY . ./var/www/nest-11-plantilla_produccion
+COPY package.json tsconfig.json tsconfig.build.json /var/www/nest-11-plantilla_produccion/
 #RUN yarn install --prod
 #RUN yarn build
 RUN npm install     #Instalamos las dependencias
@@ -15,7 +15,7 @@ RUN npm run:build   #Construimos el build
 
 # Dar permiso para ejecutar la applicación
 RUN adduser --disabled-password admin                # Creamos un usuario para que no use el default, y deshabilita el password
-RUN chown -R admin:admin /var/www/nest-12-plantilla     # Se le da acceso al nuevo usuario al directorio creado. Es para solo poder modificar eso y no el SO.
+RUN chown -R admin:admin /var/www/nest-11-plantilla_produccion     # Se le da acceso al nuevo usuario al directorio creado. Es para solo poder modificar eso y no el SO.
 USER admin                            
 # En la linea de arriba seleccionamos con que usuario vamos a trabajar
 

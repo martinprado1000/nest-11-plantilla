@@ -27,6 +27,12 @@ export class UsersController {
     private readonly logger: CustomLoggerService,
   ) {}
 
+  // @Get('genereteSeedUsers')
+  // async genereteSeedUsers(
+  // ) {
+  //   return await this.usersService.genereteSeedUsers();
+  // }
+
   // @Get('removeAllUsers')
   // async removeAllUsers(
   // ) {
