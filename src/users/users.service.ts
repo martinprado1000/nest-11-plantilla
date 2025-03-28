@@ -93,6 +93,9 @@ export class UsersService {
 
   // -----------CREATE------------------------------------------------------------------------------------
   async create(createUserDto: CreateUserDto, activeUser?: CreateUserDto ): Promise<ResponseUserDto> { // El user puede venir o no porque si es un register no viene.
+    
+    await this.isSuperadminCreate(createUserDto, activeUser);
+    
     let { password, confirmPassword } = createUserDto;
     
     if (password != confirmPassword)
@@ -137,6 +140,7 @@ export class UsersService {
   
   // -----------UPDATE------------------------------------------------------------------------------------
   async update(id: string, updateUserDto: UpdateUserDto, activeUser: CreateUserDto): Promise<ResponseUserDto> {
+    await this.isSuperadminEdit(id, activeUser);
 
     let { password, confirmPassword } = updateUserDto;
 
@@ -173,7 +177,7 @@ export class UsersService {
   // -----------DELETE-------------------------------------------------------------------------------
   async delete(id: string, activeUser: CreateUserDto): Promise<string> {
     // Usuario ADMIN no puede eliminar un usuario SUPERADMIN
-    await this.isSuperadmin(id,activeUser) // Esto lo puedo ejecutar fuera del try porque lanzaria la excepcion en el metodo fingOneResponse.
+    await this.isSuperadminEdit(id, activeUser);// Esto lo puedo ejecutar fuera del try porque lanzaria la excepcion en el metodo fingOneResponse.
 
     let deletedUser: DocumentMongoose | null;
     
@@ -196,7 +200,7 @@ export class UsersService {
   async userIsActiveFalse(id: string, activeUser: CreateUserDto ): Promise<ResponseUserDto>{
   
     // Usuario ADMIN no puede eliminar un usuario SUPERADMIN
-    await this.isSuperadmin(id, activeUser);
+    await this.isSuperadminEdit(id, activeUser);
     
     const userUpdated = await this.update(id, {isActive:false}, activeUser);
 
@@ -241,10 +245,14 @@ export class UsersService {
   //   }
   // }
 
-  private async isSuperadmin(id: string, userActive: CreateUserDto ): Promise< void | string > {
-    const userToDelete = await this.findOneResponse(id) // Esto lo puedo ejecutar fuera del try porque lanzaria la excepcion en el metodo fingOneResponse.
-    // Usuario ADMIN no puede eliminar un usuario SUPERADMIN
-    if ( !userActive.roles?.includes(Role.SUPERADMIN) && userToDelete.roles.includes(Role.SUPERADMIN)) throw new BadRequestException('Operación no permitida: Usuario ADMIN no puede modificar un usuario SUPERADMIN')
+  private async isSuperadminEdit(id: string, userActive: CreateUserDto ): Promise< void | string > {
+    const userToDelete = await this.findOneResponse(id)
+    if ( !userActive.roles?.includes(Role.SUPERADMIN) && userToDelete.roles.includes(Role.SUPERADMIN)) throw new BadRequestException('Operación no permitida: No puede modificar un usuario SUPERADMIN')
+    return
+  }
+
+  private async isSuperadminCreate(createUserDto: CreateUserDto, userActive?: CreateUserDto ): Promise< void | string > {
+    if ( !userActive?.roles?.includes(Role.SUPERADMIN) && createUserDto.roles?.includes(Role.SUPERADMIN)) throw new BadRequestException('Operación no permitida: No puede crear un usuario SUPERADMIN')
     return
   }
 

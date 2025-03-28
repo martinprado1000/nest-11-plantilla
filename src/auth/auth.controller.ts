@@ -34,10 +34,10 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  @ApiResponse({ status:201, description: 'User was registered', type: User }) // Type es lo que retorna
+  @ApiResponse({ status:201, description: 'User was registered', type: User })
   @ApiResponse({ status:400, description: 'Bad request' })
-  createUser(@Body() createUserDto: CreateUserDto) {
-    return this.authService.create(createUserDto);
+  registerUser(@Body() createUserDto: CreateUserDto) {
+    return this.authService.register(createUserDto);
   }
 
   @Post('login')

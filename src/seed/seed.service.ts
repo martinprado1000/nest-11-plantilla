@@ -1,63 +1,47 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 
 import { initialData } from './data/seed-data';
 import { UsersService } from '../users/users.service';
-import { CreateUserDto } from 'src/users/dto';
-import { Role } from 'src/users/enums/role.enums';
 
 @Injectable()
 export class SeedService {
-  private readonly passwordSeedUsers: string;
   constructor(
     private readonly usersService: UsersService,
-    private readonly configService: ConfigService,
-  ) {
-    this.passwordSeedUsers = configService.get<string>(
-      'passwordSeedUsers',
-    ) as string;
-  }
+  ) {}
 
-  // Ejecuta la semilla.
+  // Run seed.
   async runSeed() {
-    const user: CreateUserDto = {
-      name: 'userSeed',
-      lastname: 'userSeed',
-      roles: Role.SUPERADMIN,
-      email: 'userseed@gmail.com',
-      password: 'usersEEd***123456**##',
-      confirmPassword: 'usersEEd***123456**##',
-      isActive: false,
-    };
     try {
       const deleteData = await this.deleteData();
       console.log(deleteData);
-      const deleteCollections = await this.deleteCollections();
-      console.log(deleteCollections);
-      const insertUserData = await this.insertUserData();
+      // IMPORTANT: If the collection is deleted, the indexes are not created because it already inserts users before creation.
+      //const deleteCollections = await this.deleteCollections();
+      //console.log(deleteCollections);
+      const insertUserData = await this.insertUsersData();
       console.log(insertUserData);
-      return 'SEED EXECUTED';
+      return 'SEED EXECUTED'; 
     } catch (error) {
       throw new InternalServerErrorException('Please check server logs');
     }
   }
 
-  // Borra todos los datos de las colecciones
+  // Delete users
   private async deleteData() {
     return await this.usersService.removeAllUsers();
   }
 
-  // Borra las colecciones
+  // Delete colecctions
   private async deleteCollections() {
     return await this.usersService.deleteUsersCollection();
   }
 
-  // Inseta los usuarios hardcodeados
-  private async insertUserData() {
+  // Insets hardcode data
+  private async insertUsersData() {
     const seedUsers = initialData.users;
     seedUsers.forEach((user) => {
       this.usersService.create(user); 
     });
     return 'Usuarios creados con éxito';
   }
+
 }
